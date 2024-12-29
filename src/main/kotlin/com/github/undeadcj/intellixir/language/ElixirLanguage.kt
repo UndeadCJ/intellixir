@@ -1,4 +1,4 @@
-package com.github.undeadcj.intellixir
+package com.github.undeadcj.intellixir.language
 
 import com.intellij.lang.Language
 

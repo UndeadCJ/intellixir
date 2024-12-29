@@ -13,7 +13,7 @@
 
         <fileType
                 name="Elixir File"
-                implementationClass="com.github.undeadcj.intellixir.ElixirFileType"
+                implementationClass="com.github.undeadcj.intellixir.language.ElixirFileType"
                 fieldName="INSTANCE"
                 language="Elixir"
                 extensions="ex"/>

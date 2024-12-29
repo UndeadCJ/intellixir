@@ -1,5 +1,6 @@
-package com.github.undeadcj.intellixir
+package com.github.undeadcj.intellixir.language
 
+import com.github.undeadcj.intellixir.ElixirIcons
 import com.intellij.openapi.fileTypes.LanguageFileType
 import javax.swing.Icon
 
