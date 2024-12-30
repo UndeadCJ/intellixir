@@ -5,93 +5,88 @@ import com.intellij.openapi.util.SystemInfo
 import java.io.File
 import java.net.URI
 import java.nio.file.FileSystems
+import java.util.zip.ZipInputStream
 
-class ElixirLspServerLoader(val project: Project) {
+class ElixirLspServerLoader(private val project: Project) {
+
     private val settings = ElixirServiceSettings.getInstance(project)
 
     init {
-        if (!releaseDir.exists()) {
-            releaseDir.mkdirs()
-        }
+        ensureDirectoryExists(RELEASE_DIR)
     }
 
-    private fun findExecutable() =
-        releaseDir.listFiles()?.find { file ->
-            file.name == LSP_EXECUTABLE_NAME
-        }?.path
+    fun load(): String {
+        if (!isLspInstalled()) {
+            installLatestVersion()
+        }
+        return findExecutable() ?: throw IllegalStateException("LSP executable not found after installation.")
+    }
 
-    private fun lspIsInstalled() = findExecutable() != null
+    private fun findExecutable(): String? =
+        RELEASE_DIR.listFiles()?.find { it.name == LSP_EXECUTABLE_NAME }?.absolutePath
 
-    private fun downloadAsset(): File {
-        val connection = assetUri.toURL().openConnection()
-        val outputFile = File(releaseDir, assetName)
+    private fun isLspInstalled() = findExecutable() != null
+
+    private fun installLatestVersion() {
+        val assetFile = downloadAsset(ASSET_URI, RELEASE_DIR, ASSET_NAME)
+        extractZip(assetFile, RELEASE_DIR)
+    }
+
+    private fun downloadAsset(uri: URI, outputDir: File, fileName: String): File {
+        val connection = uri.toURL().openConnection()
+        val outputFile = File(outputDir, fileName)
 
         connection.getInputStream().use { input ->
             outputFile.outputStream().use { output ->
                 input.copyTo(output)
             }
         }
+
         return outputFile
-    }
-
-    private fun getLatest() {
-        extractZip(downloadAsset(), releaseDir)
-    }
-
-    fun load(): String {
-        if (!lspIsInstalled()) {
-            getLatest()
-        }
-
-        return findExecutable()!!
-    }
-
-    companion object {
-        private val fileSeparator = FileSystems.getDefault().separator ?: File.pathSeparator
-
-        private val baseDir = "${System.getProperty("user.home")}${fileSeparator}.intellixir".run { File(this) }
-        private val releaseDir = "${baseDir.path}${fileSeparator}elixir-ls".run { File(this) }
-
-        private val lspVersion = "0.25.0"
-        private val assetName = "elixir-ls-v${lspVersion}.zip"
-
-        private val assetUri =
-            URI("https://github.com/elixir-lsp/elixir-ls/releases/download/v${lspVersion}/$assetName")
-
-        val LSP_EXECUTABLE_NAME: String =
-            if (SystemInfo.isWindows) "language_server.bat" else "language_server.sh"
     }
 
     private fun extractZip(zipFile: File, outputDir: File) {
         val buffer = ByteArray(1024)
 
         zipFile.inputStream().use { fis ->
-            java.util.zip.ZipInputStream(fis).use { zis ->
-                var entry = zis.nextEntry
-                while (entry != null) {
+            ZipInputStream(fis).use { zis ->
+                generateSequence { zis.nextEntry }.forEach { entry ->
                     val newFile = File(outputDir, entry.name)
+
                     if (entry.isDirectory) {
-                        newFile.mkdirs()
+                        ensureDirectoryExists(newFile)
                     } else {
                         newFile.outputStream().use { fos ->
-                            var len = zis.read(buffer)
-                            while (len > 0) {
-                                fos.write(buffer, 0, len)
-                                len = zis.read(buffer)
-                            }
+                            generateSequence { zis.read(buffer).takeIf { it > 0 } }
+                                .forEach { fos.write(buffer, 0, it) }
                         }
+                        setFilePermissions(newFile)
                     }
-                    setFilePermissions(newFile)
-                    entry = zis.nextEntry
                 }
-                zis.closeEntry()
             }
         }
     }
 
+    private fun ensureDirectoryExists(dir: File) {
+        if (!dir.exists() && !dir.mkdirs()) {
+            throw IllegalStateException("Failed to create directory: ${dir.path}")
+        }
+    }
+
     private fun setFilePermissions(file: File) {
-        file.setExecutable(true)
-        file.setReadable(true)
-        file.setWritable(true)
+        if (!file.setExecutable(true) || !file.setReadable(true) || !file.setWritable(true)) {
+            throw IllegalStateException("Failed to set permissions for file: ${file.path}")
+        }
+    }
+
+    companion object {
+        private val FILE_SEPARATOR = FileSystems.getDefault().separator
+        private val BASE_DIR = File(System.getProperty("user.home") + FILE_SEPARATOR + ".intellixir")
+        private val RELEASE_DIR = File(BASE_DIR, "elixir-ls")
+        private const val LSP_VERSION = "0.25.0"
+        private const val ASSET_NAME = "elixir-ls-v${LSP_VERSION}.zip"
+        private val ASSET_URI =
+            URI("https://github.com/elixir-lsp/elixir-ls/releases/download/v${LSP_VERSION}/$ASSET_NAME")
+        val LSP_EXECUTABLE_NAME: String = if (SystemInfo.isWindows) "language_server.bat" else "language_server.sh"
     }
 }
