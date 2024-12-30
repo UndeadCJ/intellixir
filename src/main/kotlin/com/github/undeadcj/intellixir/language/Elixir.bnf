@@ -1,0 +1,21 @@
+{
+  parserClass="com.github.undeadcj.intellixir.language.parser.ElixirParser"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="Elixir"
+  psiImplClassSuffix="Impl"
+  psiPackage="com.github.undeadcj.intellixir.language.psi"
+  psiImplPackage="com.github.undeadcj.intellixir.language.psi.impl"
+
+  elementTypeHolderClass="com.github.undeadcj.intellixir.language.psi.ElixirTypes"
+  elementTypeClass="com.github.undeadcj.intellixir.language.psi.ElixirElementType"
+  tokenTypeClass="com.github.undeadcj.intellixir.language.psi.ElixirTokenType"
+}
+
+ElixirFile ::= item_*
+
+private item_ ::= (property|COMMENT|CRLF)
+
+property ::= (KEY? SEPARATOR VALUE?) | KEY
+

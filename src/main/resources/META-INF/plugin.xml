@@ -32,8 +32,15 @@
                              instance="com.github.undeadcj.intellixir.ide.ui.ElixirSettingsConfigurable"
                              bundle="messages.ElixirBundle"
                              key="elixir.settings.configurable.title"
-                             nonDefaultProject="true"
-        />
+                             nonDefaultProject="true"/>
+
+        <lang.parserDefinition
+                language="Elixir"
+                implementationClass="com.github.undeadcj.intellixir.language.ElixirParserDefinition"/>
+
+        <lang.syntaxHighlighterFactory
+                language="Elixir"
+                implementationClass="com.github.undeadcj.intellixir.ide.highlighting.ElixirSyntaxHighlighterFactory"/>
     </extensions>
 
     <applicationListeners>
