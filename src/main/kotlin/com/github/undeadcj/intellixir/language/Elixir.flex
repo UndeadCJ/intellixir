@@ -1,5 +1,4 @@
-// Copyright 2000-2022 JetBrains s.r.o. and other contributors. Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE file.
-package org.intellij.sdk.language;
+package com.github.undeadcj.intellixir.language;
 
 import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
@@ -13,33 +12,91 @@ import com.intellij.psi.TokenType;
 %unicode
 %function advance
 %type IElementType
-%eof{  return;
+%eof{
+    return;
 %eof}
+%eofval{
+    return null;
+%eofval}
 
-CRLF=\R
-WHITE_SPACE=[\ \n\t\f]
-FIRST_VALUE_CHARACTER=[^ \n\f\\] | "\\"{CRLF} | "\\".
-VALUE_CHARACTER=[^\n\f\\] | "\\"{CRLF} | "\\".
-END_OF_LINE_COMMENT=("#"|"!")[^\r\n]*
-SEPARATOR=[:=]
-KEY_CHARACTER=[^:=\ \n\t\f\\] | "\\ "
+%{
+%}
 
-%state WAITING_VALUE
+// Basic Definitions
+LINE_TERMINATOR = \r|\n|\r\n
+WHITESPACE = {LINE_TERMINATOR} | [ \t\f]
+COMMENT = "#"[^\r\n]*
+SIGIL = "~"[A-Z]
+
+// Docstrings
+DOC_OPEN="@doc"
+MODULE_DOC_OPEN="@moduledoc"
+TRIPLE_QUOTE=\"\"\"
+DOCSTRING = {DOC_OPEN}[ \t]({SIGIL})?{TRIPLE_QUOTE}([^\"]|\"\"{TRIPLE_QUOTE}|\"{1,2}[^\"])*{TRIPLE_QUOTE}
+MODULE_DOCSTRING = {MODULE_DOC_OPEN}[ \t]({SIGIL})?{TRIPLE_QUOTE}([^\"]|\"\"{TRIPLE_QUOTE}|\"{1,2}[^\"])*{TRIPLE_QUOTE}
+
+// Literals
+ATOM = :[a-zA-Z_][a-zA-Z0-9_]*
+STRING = \"([^\"\\]|\\.)*\"
+IDENTIFIER = [a-z][a-zA-Z0-9_]*
+INTEGER = [0-9]+
+
+// Keywords
+KEYWORDS =
+  "def" | 
+  "defmodule" | 
+  "defp" | 
+  "do" | 
+  "end" | 
+  "if" | 
+  "else" | 
+  "case" | 
+  "when" | 
+  "fn" | 
+  "true" | 
+  "false" | 
+  "nil" |
+  "and" |
+  "or" |
+  "not" |
+  "in" |
+  "for" |
+  "with" |
+  "receive" |
+  "try" |
+  "catch" |
+  "raise" |
+  "alias" |
+  "use" |
+  "import" |
+  "require";
+
+KEYWORD = ({WHITESPACE}|[,(])?{KEYWORDS}({WHITESPACE}|[,)])
 
 %%
 
-<YYINITIAL> {END_OF_LINE_COMMENT}                           { yybegin(YYINITIAL); return ElixirTypes.COMMENT; }
+<YYINITIAL> {
+    // Docstrings
+    {DOCSTRING}   { return ElixirTypes.DOCSTRING; }
+    {MODULE_DOCSTRING}   { return ElixirTypes.DOCSTRING; }
 
-<YYINITIAL> {KEY_CHARACTER}+                                { yybegin(YYINITIAL); return ElixirTypes.KEY; }
+    // Keywords
+    {KEYWORD}   { return ElixirTypes.KEYWORD; }
 
-<YYINITIAL> {SEPARATOR}                                     { yybegin(WAITING_VALUE); return ElixirTypes.SEPARATOR; }
+    // Literals
+    {ATOM}        { return ElixirTypes.ATOM; }
+    {STRING} {return ElixirTypes.STRING; }
 
-<WAITING_VALUE> {CRLF}({CRLF}|{WHITE_SPACE})+               { yybegin(YYINITIAL); return TokenType.WHITE_SPACE; }
+    // Identifiers
+    {IDENTIFIER} {return ElixirTypes.IDENTIFIER; }
 
-<WAITING_VALUE> {WHITE_SPACE}+                              { yybegin(WAITING_VALUE); return TokenType.WHITE_SPACE; }
+    // Numbers
+    {INTEGER} {return ElixirTypes.INTEGER; }
+}
 
-<WAITING_VALUE> {FIRST_VALUE_CHARACTER}{VALUE_CHARACTER}*   { yybegin(YYINITIAL); return ElixirTypes.VALUE; }
+// Comments
+{COMMENT}           { return ElixirTypes.COMMENT; }
 
-({CRLF}|{WHITE_SPACE})+                                     { yybegin(YYINITIAL); return TokenType.WHITE_SPACE; }
-
-[^]                                                         { return TokenType.BAD_CHARACTER; }
+// Whitespaces e caracteres inválidos
+{WHITESPACE}        { return TokenType.WHITE_SPACE; }
+[^]                 { return TokenType.BAD_CHARACTER; }

@@ -13,9 +13,52 @@
   tokenTypeClass="com.github.undeadcj.intellixir.language.psi.ElixirTokenType"
 }
 
-ElixirFile ::= item_*
+elixirFile ::= item_*
 
-private item_ ::= (property|COMMENT|CRLF)
+private item_ ::= (comment | docstring | keyword | atom)
 
-property ::= (KEY? SEPARATOR VALUE?) | KEY
+// Single-line comments
+comment ::= "#" ".*"? ("\n" | EOF)
 
+// Docstrings
+docstring ::= "@" ("doc"|"moduledoc") STRING_LITERAL
+
+// Atoms
+atom ::= ":" STRING_LITERAL
+
+// Identifiers
+private identifier ::= IDENTIFIER
+
+// Numbers
+private integer ::= INTEGER
+private string ::= STRING
+
+// Keywords in Elixir
+keyword ::=
+  "def" |
+  "defmodule" |
+  "defp" |
+  "do" |
+  "end" |
+  "if" |
+  "else" |
+  "case" |
+  "when" |
+  "fn" |
+  "true" |
+  "false" |
+  "nil" |
+  "and" |
+  "or" |
+  "not" |
+  "in" |
+  "for" |
+  "with" |
+  "receive" |
+  "try" |
+  "catch" |
+  "raise" |
+  "alias" |
+  "use" |
+  "import" |
+  "require"

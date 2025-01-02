@@ -10,33 +10,60 @@ import com.intellij.psi.tree.IElementType
 
 
 class ElixirSyntaxHighlighter : SyntaxHighlighterBase() {
-    val SEPARATOR: TextAttributesKey =
-        createTextAttributesKey("SIMPLE_SEPARATOR", DefaultLanguageHighlighterColors.OPERATION_SIGN)
-    val KEY: TextAttributesKey = createTextAttributesKey("SIMPLE_KEY", DefaultLanguageHighlighterColors.KEYWORD)
-    val VALUE: TextAttributesKey = createTextAttributesKey("SIMPLE_VALUE", DefaultLanguageHighlighterColors.STRING)
     val COMMENT: TextAttributesKey =
-        createTextAttributesKey("SIMPLE_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT)
+        createTextAttributesKey("ELIXIR_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT)
 
-    private val SEPARATOR_KEYS = arrayOf(SEPARATOR)
-    private val KEY_KEYS = arrayOf(KEY)
-    private val VALUE_KEYS = arrayOf(VALUE)
+    val DOCSTRING: TextAttributesKey =
+        createTextAttributesKey("ELIXIR_DOCSTRING", DefaultLanguageHighlighterColors.DOC_COMMENT)
+
+    val KEYWORD: TextAttributesKey =
+        createTextAttributesKey("ELIXIR_KEYWORD", DefaultLanguageHighlighterColors.KEYWORD)
+
+    val ATOM: TextAttributesKey =
+        createTextAttributesKey("ELIXIR_ATOM", DefaultLanguageHighlighterColors.INSTANCE_FIELD)
+
+    val IDENTIFIER: TextAttributesKey =
+        createTextAttributesKey("ELIXIR_IDENTIFIER", DefaultLanguageHighlighterColors.IDENTIFIER)
+
+    val NUMBER: TextAttributesKey =
+        createTextAttributesKey("ELIXIR_NUMBER", DefaultLanguageHighlighterColors.NUMBER)
+
+    val STRING: TextAttributesKey =
+        createTextAttributesKey("ELIXIR_STRING", DefaultLanguageHighlighterColors.STRING)
+
+
     private val COMMENT_KEYS = arrayOf(COMMENT)
+    private val DOCSTRING_KEYS = arrayOf(DOCSTRING)
+    private val KEYWORD_KEYS = arrayOf(KEYWORD)
+    private val ATOM_KEYS = arrayOf(ATOM)
+    private val IDENTIFIER_KEYS = arrayOf(IDENTIFIER)
+    private val NUMBER_KEYS = arrayOf(NUMBER)
+    private val STRING_KEYS = arrayOf(STRING)
     private val EMPTY_KEYS = emptyArray<TextAttributesKey>()
 
     override fun getHighlightingLexer() = ElixirLexerAdapter()
 
     override fun getTokenHighlights(tokenType: IElementType): Array<TextAttributesKey> {
-        if (tokenType == ElixirTypes.SEPARATOR) {
-            return SEPARATOR_KEYS
-        }
-        if (tokenType == ElixirTypes.KEY) {
-            return KEY_KEYS
-        }
-        if (tokenType == ElixirTypes.VALUE) {
-            return VALUE_KEYS
-        }
         if (tokenType == ElixirTypes.COMMENT) {
             return COMMENT_KEYS
+        }
+        if (tokenType == ElixirTypes.DOCSTRING) {
+            return DOCSTRING_KEYS
+        }
+        if (tokenType == ElixirTypes.KEYWORD) {
+            return KEYWORD_KEYS
+        }
+        if (tokenType == ElixirTypes.ATOM) {
+            return ATOM_KEYS
+        }
+        if (tokenType == ElixirTypes.IDENTIFIER) {
+            return IDENTIFIER_KEYS
+        }
+        if (tokenType == ElixirTypes.INTEGER) {
+            return NUMBER_KEYS
+        }
+        if (tokenType == ElixirTypes.STRING) {
+            return STRING_KEYS
         }
 
         return EMPTY_KEYS
