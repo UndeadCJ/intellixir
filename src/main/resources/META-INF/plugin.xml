@@ -5,6 +5,7 @@
     <vendor>undeadcj</vendor>
 
     <depends>com.intellij.modules.platform</depends>
+    <depends>org.jetbrains.plugins.textmate</depends>
 
     <resource-bundle>messages.ElixirBundle</resource-bundle>
 
@@ -18,6 +19,16 @@
                 language="Elixir"
                 extensions="ex"/>
 
+        <!-- TextMate -->
+        <editorHighlighterProvider
+                filetype="Elixir File"
+                implementationClass="org.jetbrains.plugins.textmate.language.syntax.highlighting.TextMateEditorHighlighterProvider" />
+
+        <lang.syntaxHighlighterFactory
+                language="Elixir"
+                implementationClass="org.jetbrains.plugins.textmate.language.syntax.highlighting.TextMateSyntaxHighlighterFactory" />
+
+        <textmate.bundleProvider implementation="com.github.undeadcj.intellixir.ide.textmate.ElixirBundleProvider"/>
 
         <!-- LSP -->
         <platform.lsp.serverSupportProvider
@@ -33,14 +44,6 @@
                              bundle="messages.ElixirBundle"
                              key="elixir.settings.configurable.title"
                              nonDefaultProject="true"/>
-
-        <lang.parserDefinition
-                language="Elixir"
-                implementationClass="com.github.undeadcj.intellixir.language.ElixirParserDefinition"/>
-
-        <lang.syntaxHighlighterFactory
-                language="Elixir"
-                implementationClass="com.github.undeadcj.intellixir.ide.highlighting.ElixirSyntaxHighlighterFactory"/>
     </extensions>
 
     <applicationListeners>

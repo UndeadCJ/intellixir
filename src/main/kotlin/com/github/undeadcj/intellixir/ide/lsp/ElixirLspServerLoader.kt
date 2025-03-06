@@ -46,7 +46,7 @@ class ElixirLspServerLoader(private val project: Project) {
     }
 
     private fun extractZip(zipFile: File, outputDir: File) {
-        val buffer = ByteArray(1024)
+       val buffer = ByteArray(1024)
 
         zipFile.inputStream().use { fis ->
             ZipInputStream(fis).use { zis ->
@@ -83,7 +83,7 @@ class ElixirLspServerLoader(private val project: Project) {
         private val FILE_SEPARATOR = FileSystems.getDefault().separator
         private val BASE_DIR = File(System.getProperty("user.home") + FILE_SEPARATOR + ".intellixir")
         private val RELEASE_DIR = File(BASE_DIR, "elixir-ls")
-        private const val LSP_VERSION = "0.25.0"
+        private const val LSP_VERSION = "0.27.1"
         private const val ASSET_NAME = "elixir-ls-v${LSP_VERSION}.zip"
         private val ASSET_URI =
             URI("https://github.com/elixir-lsp/elixir-ls/releases/download/v${LSP_VERSION}/$ASSET_NAME")

@@ -10,7 +10,7 @@ class ElixirLspServerDescriptor(project: Project) : ProjectWideLspServerDescript
     val lspServerPath = ElixirLspServerLoader(project).load()
 
     override fun isSupportedFile(file: VirtualFile): Boolean {
-        return file.extension == "ex" || file.extension == "exs" || file.extension == "heex"
+        return file.extension in listOf("ex", "exs", "heex")
     }
 
     override fun createCommandLine() = GeneralCommandLine(lspServerPath, "--stdio")
