@@ -16,7 +16,7 @@ version = providers.gradleProperty("pluginVersion").get()
 
 // Set the JVM language level used to build the project.
 kotlin {
-    jvmToolchain(21)
+    jvmToolchain(17)
 }
 
 // Configure project's dependencies
@@ -53,6 +53,8 @@ dependencies {
 // Configure IntelliJ Platform Gradle Plugin - read more: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-extension.html
 intellijPlatform {
     pluginConfiguration {
+        name = providers.gradleProperty("pluginName")
+
         version = providers.gradleProperty("pluginVersion")
 
         // Extract the <!-- Plugin description --> section from README.md and provide for the plugin's manifest
@@ -127,6 +129,13 @@ kover {
 }
 
 tasks {
+    prepareSandbox {
+        from("src/main/resources/textmate/bundles/elixir") {
+            include("**")
+            into("${intellijPlatform.pluginConfiguration.name.get()}/textmate/elixir")
+        }
+    }
+
     wrapper {
         gradleVersion = providers.gradleProperty("gradleVersion").get()
     }
@@ -156,3 +165,5 @@ intellijPlatformTesting {
         }
     }
 }
+
+sourceSets["main"].java.srcDirs("src/main/gen")

@@ -3,3 +3,11 @@
 .intellijPlatform
 .qodana
 build
+
+# Generated Files
+src/main/gen
+intellixir
+
+# IDE Generators
+idea-flex.skeleton
+jflex-1.9.1.jar

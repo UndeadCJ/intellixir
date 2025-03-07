@@ -5,6 +5,7 @@
     <vendor>undeadcj</vendor>
 
     <depends>com.intellij.modules.platform</depends>
+    <depends>org.jetbrains.plugins.textmate</depends>
 
     <resource-bundle>messages.ElixirBundle</resource-bundle>
 
@@ -16,8 +17,33 @@
                 implementationClass="com.github.undeadcj.intellixir.language.ElixirFileType"
                 fieldName="INSTANCE"
                 language="Elixir"
-                extensions="ex"/>
+                extensions="ex;exs"/>
 
+        <fileType
+                name="HEEx File"
+                implementationClass="com.github.undeadcj.intellixir.language.HEExFileType"
+                fieldName="INSTANCE"
+                language="HEEx"
+                extensions="heex"/>
+
+        <!-- TextMate -->
+        <editorHighlighterProvider
+                filetype="Elixir File"
+                implementationClass="org.jetbrains.plugins.textmate.language.syntax.highlighting.TextMateEditorHighlighterProvider" />
+
+        <lang.syntaxHighlighterFactory
+                language="Elixir"
+                implementationClass="org.jetbrains.plugins.textmate.language.syntax.highlighting.TextMateSyntaxHighlighterFactory" />
+
+        <editorHighlighterProvider
+                filetype="HEEx File"
+                implementationClass="org.jetbrains.plugins.textmate.language.syntax.highlighting.TextMateEditorHighlighterProvider" />
+
+        <lang.syntaxHighlighterFactory
+                language="HEEx"
+                implementationClass="org.jetbrains.plugins.textmate.language.syntax.highlighting.TextMateSyntaxHighlighterFactory" />
+
+        <textmate.bundleProvider implementation="com.github.undeadcj.intellixir.ide.textmate.ElixirBundleProvider"/>
 
         <!-- LSP -->
         <platform.lsp.serverSupportProvider
@@ -32,8 +58,7 @@
                              instance="com.github.undeadcj.intellixir.ide.ui.ElixirSettingsConfigurable"
                              bundle="messages.ElixirBundle"
                              key="elixir.settings.configurable.title"
-                             nonDefaultProject="true"
-        />
+                             nonDefaultProject="true"/>
     </extensions>
 
     <applicationListeners>
