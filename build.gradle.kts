@@ -132,7 +132,7 @@ tasks {
     prepareSandbox {
         from("src/main/resources/textmate/bundles/elixir") {
             include("**")
-            into("${intellijPlatform.pluginConfiguration.name.get()}/textmate")
+            into("${intellijPlatform.pluginConfiguration.name.get()}/textmate/elixir")
         }
     }
 
